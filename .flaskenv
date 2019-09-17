@@ -1,0 +1,2 @@
+FLASK_APP=jaysblog
+FLASK_ENV=development
