@@ -7,3 +7,7 @@
  @FileName: back_manager_controller.py
  @GitHub  : https://github.com/cRiii
 """
+
+from flask import Blueprint
+
+admin_bp = Blueprint('admin_controller', __name__)

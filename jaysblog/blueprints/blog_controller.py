@@ -7,3 +7,7 @@
  @FileName: blog_controller.py
  @GitHub  : https://github.com/cRiii
 """
+
+from flask import Blueprint
+
+blog_bp = Blueprint('blog_controller', __name__)

@@ -15,9 +15,11 @@ import click
 from flask import Flask, jsonify
 from flask_wtf.csrf import generate_csrf
 from jaysblog.extensions import db, manager, cache, moment, login_manager, redis_store, csrf_protect
-from jaysblog.models import User
+from jaysblog.models import User, Category, Comment, Reply, Post
 from jaysblog.settings import config
 from jaysblog.blueprints.auth_controller import auth_bp
+from jaysblog.blueprints.admin_controller import admin_bp
+from jaysblog.blueprints.blog_controller import blog_bp
 
 
 def create_app(config_name=None):
@@ -52,7 +54,7 @@ def register_shell_context(app):
     """
     @app.shell_context_processor
     def make_shell_context():
-        return dict(db=db)
+        return dict(db=db, User=User, Category=Category, Comment=Comment, Reply=Reply, Post=Post)
 
 
 def register_extensions(app):
@@ -65,6 +67,8 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
+    app.register_blueprint(blog_bp)
+    app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
 
