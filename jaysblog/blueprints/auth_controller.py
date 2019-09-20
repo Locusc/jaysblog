@@ -17,7 +17,7 @@ from jaysblog.utils.captcha import captcha
 from jaysblog.extensions import redis_store
 from jaysblog.utils.response_code import RET
 
-auth_bp = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth_controller', __name__)
 
 
 @auth_bp.route("/image_code")

@@ -17,7 +17,7 @@ from flask_wtf.csrf import generate_csrf
 from jaysblog.extensions import db, manager, cache, moment, login_manager, redis_store, csrf_protect
 from jaysblog.models import User
 from jaysblog.settings import config
-from jaysblog.blueprints.auth import auth_bp
+from jaysblog.blueprints.auth_controller import auth_bp
 
 
 def create_app(config_name=None):
