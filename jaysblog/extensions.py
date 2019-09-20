@@ -31,6 +31,6 @@ def load_user(user_id):
         为了获取用户模型类对象 设置用户加载函数
         接收id作为参数 返回对应的用户对象
     """
-    from jaysblog.models import UserModel
-    user = UserModel.query.get(int(user_id))
+    from jaysblog.models import User
+    user = User.query.get(int(user_id))
     return user

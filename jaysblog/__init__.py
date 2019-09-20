@@ -15,7 +15,7 @@ import click
 from flask import Flask, jsonify
 from flask_wtf.csrf import generate_csrf
 from jaysblog.extensions import db, manager, cache, moment, login_manager, redis_store, csrf_protect
-from jaysblog.models import UserModel
+from jaysblog.models import User
 from jaysblog.settings import config
 from jaysblog.blueprints.auth import auth_bp
 
@@ -135,7 +135,7 @@ def register_commands(app):
                   confirmation_prompt=True, hide_input=True)
     def init(username, password):
         db.create_all()
-        user = UserModel()
+        user = User()
         user.nick_name = username,
         user.mobile = username,
         user.is_admin = True,

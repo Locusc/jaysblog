@@ -12,7 +12,7 @@ from datetime import datetime
 from flask import Blueprint, make_response, request, current_app, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 
-from jaysblog import constants, UserModel, db
+from jaysblog import constants, User, db
 from jaysblog.utils.captcha import captcha
 from jaysblog.extensions import redis_store
 from jaysblog.utils.response_code import RET
@@ -59,7 +59,7 @@ def login():
         return jsonify(rescode=RET.PARAMS_MISSING_ERROR, resmsg='参数错误,缺少参数')
 
     try:
-        user = UserModel.query.first()
+        user = User.query.first()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(rescode=RET.DATABASE_SELECT_ERROR, resmsg='查询数据库用户信息错误')
@@ -99,7 +99,7 @@ def register():
     if not all([nick_name, password, mobile, email, desc]):
         return jsonify(rescode=RET.PARAMS_MISSING_ERROR, resmsg='参数缺失错误')
 
-    user = UserModel()
+    user = User()
     user.desc = desc
     user.email = email
     user.mobile = mobile
