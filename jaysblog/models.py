@@ -73,7 +73,7 @@ class Post(BaseModel, db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 文章编号
     post_title = db.Column(db.String(256), nullable=False)  # 文章标题
     post_user_id = db.Column(db.Integer, nullable=False)  # 创建文章用户
-    post_digest = db.Column(db.String(512), nullable=False)  # 文章简介
+    post_digest = db.Column(db.String(512), nullable=True)  # 文章简介
     post_content = db.Column(db.Text, nullable=False)  # 文章内容
     post_clicks = db.Column(db.Integer, default=0)  # 点击量
     post_like_num = db.Column(db.Integer, default=0)  # 点赞数量

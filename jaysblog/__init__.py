@@ -12,7 +12,7 @@ import os
 from logging.handlers import RotatingFileHandler
 
 import click
-from flask import Flask, jsonify
+from flask import Flask
 from flask_wtf.csrf import generate_csrf
 from jaysblog.extensions import db, manager, cache, moment, login_manager, redis_store, csrf_protect
 from jaysblog.models import User, Category, Comment, Reply, Post
