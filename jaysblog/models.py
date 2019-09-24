@@ -38,7 +38,7 @@ class User(BaseModel, db.Model, UserMixin):
     avatar_url = db.Column(db.String(256))  # 用户头像路径
     is_admin = db.Column(db.Boolean, default=False)  # 是否为管理员
     last_login_time = db.Column(db.DateTime, default=datetime.now)  # 最后一次登陆时间
-    is_delete = db.Column(db.Integer, default=0)  # 用户是否被删除
+    is_delete = db.Column(db.Integer, default=1)  # 用户是否被删除 1正常  0被删除
     gender = db.Column(
         db.Enum(
             'MAN',  # 男
@@ -111,8 +111,8 @@ class Reply(BaseModel, db.Model):
     __tablename__ = 'b_reply'
 
     id = db.Column(db.Integer, primary_key=True)  # 回复的id
-    reply_from_user = db.Column(db.Integer, nullable=False)  # 谁回复的
-    reply_to_user = db.Column(db.Integer, nullable=False)  # 回复给谁的
+    reply_from_user = db.Column(db.String(32), nullable=False)  # 谁回复的
+    reply_to_user = db.Column(db.String(32), nullable=False)  # 回复给谁的
     reply_content = db.Column(db.Text, nullable=False)  # 回复的内容
 
     reply_comment_id = db.Column(db.Integer, db.ForeignKey('b_comments.id'), nullable=False)  # 当前回复属于的评论id

@@ -17,7 +17,7 @@ from jaysblog.utils.captcha import captcha
 from jaysblog.extensions import redis_store
 from jaysblog.utils.response_code import RET
 
-auth_bp = Blueprint('auth_controller', __name__)
+auth_bp = Blueprint('auth_blueprint', __name__)
 
 
 @auth_bp.route("/image_code")
@@ -132,3 +132,6 @@ def logout():
         current_app.logger.error(e)
         return jsonify(rescode=RET.USER_LOGOUT_ERROR, resmsg='用户退出失败')
     return jsonify(rescode=RET.OK, resmsg='用户已退出')
+
+
+

@@ -10,4 +10,4 @@
 
 from flask import Blueprint
 
-blog_bp = Blueprint('blog_controller', __name__)
+blog_bp = Blueprint('blog_blueprint', __name__)

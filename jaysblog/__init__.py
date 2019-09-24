@@ -17,9 +17,10 @@ from flask_wtf.csrf import generate_csrf
 from jaysblog.extensions import db, manager, cache, moment, login_manager, redis_store, csrf_protect
 from jaysblog.models import User, Category, Comment, Reply, Post
 from jaysblog.settings import config
-from jaysblog.blueprints.auth_controller import auth_bp
-from jaysblog.blueprints.admin_controller import admin_bp
-from jaysblog.blueprints.blog_controller import blog_bp
+from jaysblog.blueprints.auth_blueprint import auth_bp
+from jaysblog.blueprints.admin_blueprint import admin_bp
+from jaysblog.blueprints.blog_blueprint import blog_bp
+from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user
 
 
 def create_app(config_name=None):
@@ -29,7 +30,7 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    register_logging(config_name, app)  # 注册日志处理器
+    # register_logging(app, config_name)  # 注册日志处理器
     register_blueprints(app)  # 注册蓝图
     register_errors(app)  # 注册错误处理器
     register_extensions(app)  # 注册扩展(扩展初始化)
@@ -101,7 +102,7 @@ def register_csrf(app):
         return response
 
 
-def register_logging(config_name, app):
+def register_logging(app, config_name):
     # 在__init__.create_app(config_name)设置了日志的记录等级
     # 调试debug级
     logging.basicConfig(level=config[config_name].LOG_LEVEL)
@@ -123,6 +124,17 @@ def register_logging(config_name, app):
 
 
 def register_commands(app):
+    @app.cli.command()
+    @click.option('--drop', is_flag=True, help='Create after drop.')
+    def initDataBase(drop):
+        """初始化数据库"""
+        if drop:
+            click.confirm('This operation will delete the database, do you want to continue?')
+            db.drop_all()
+            click.echo('Drop tables')
+        db.create_all()
+        click.echo('Initialized database.')
+
     """
         prompt:
             如果用户没有输入 以提示符的形式请求输入
@@ -138,13 +150,62 @@ def register_commands(app):
     @click.option('--password', prompt=True, help='The password used to login',
                   confirmation_prompt=True, hide_input=True)
     def init(username, password):
+        click.echo('Initializing the database')
         db.create_all()
-        user = User()
-        user.nick_name = username,
-        user.mobile = username,
-        user.is_admin = True,
-        user.password = password
-        db.session.add(user)
+
+        user = User.query.first()
+        if user is not None:
+            click.echo('The administrator already exists, updating...')
+            user.nick_name = username
+            user.password = password
+        else:
+            click.echo('Creating the temporary administrator account...')
+            user = User()
+            user.nick_name = username,
+            user.mobile = '13888888888',
+            user.is_admin = True,
+            user.password = password
+            db.session.add(user)
+
+        category = Category.query.first()
+        if category is None:
+            click.echo('Creating the default category...')
+            category = Category()
+            category.cg_name = 'Default'
+
         db.session.commit()
         click.echo('done')
+
+    @app.cli.command()
+    @click.option('--user', default=50, help='Quantity of users, default is 50.')
+    @click.option('--category', default=10, help='Quantity of categories, default is 10.')
+    @click.option('--post', default=50, help='Quantity of posts, default is 50.')
+    @click.option('--comment', default=500, help='Quantity of comments, default is 500.')
+    @click.option('--reply', default=1000, help='Quantity of comments, default is 1000.')
+    def forge(user, category, post, comment, reply):
+        """Generate fake data."""
+        db.drop_all()
+        db.create_all()
+
+        click.echo('Generating the administrator.')
+        fake_admin()
+
+        click.echo('Generating the users %s.' % user)
+        fake_user(user)
+
+        click.echo('Generating the categories %s.' % category)
+        fake_categories(category)
+
+        click.echo('Generating the posts %s.' % post)
+        fake_posts(post)
+
+        click.echo('Generating the comments %s.' % comment)
+        fake_comment(comment)
+
+        click.echo('Generating the replies %s.' % reply)
+        fake_replies(reply)
+
+        click.echo('done')
+
+
 

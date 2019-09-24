@@ -14,18 +14,35 @@ from faker import Faker
 from sqlalchemy.exc import IntegrityError
 from jaysblog import db
 from jaysblog.models import Comment, Category, User, Post, Reply
+from jaysblog.utils.tools import random_mobile
 
 fake = Faker()
 
 
-# 增加虚拟用户
-def fake_user():
+# 增加管理员
+def fake_admin():
     user = User()
     user.nick_name = 'JayChen'
     user.password = '123456'
     user.mobile = '13688888888'
     user.email = '2227628925@qq.com'
+    user.is_admin = True
     db.session.add(user)
+    db.session.commit()
+
+
+# 增加虚拟用户
+def fake_user(count=50):
+    gender = ('MAN', 'WOMAN')
+    for i in range(count):
+        user = User()
+        user.nick_name = fake.name()
+        user.password = '123456'
+        user.mobile = random_mobile()
+        user.email = fake.email()
+        user.is_admin = False
+        user.gender = random.choice(gender)
+        db.session.add(user)
     db.session.commit()
 
 
@@ -33,6 +50,7 @@ def fake_user():
 def fake_categories(count=10):
     category = Category()
     category.cg_name = 'Default'
+    db.session.add(category)
 
     for i in range(count):
         category = Category()
@@ -46,19 +64,64 @@ def fake_categories(count=10):
 
 # 增加虚拟文章
 def fake_posts(count=50):
-    post = Post()
     for i in range(count):
+        post = Post()
         post.post_title = fake.sentence()
-        post.post_user_id = User.query.get(1)
+        post.post_user_id = User.query.get(1).id
         post.post_content = fake.text(2000)
-        post.post_category_id = Category.query.get(random.randint(1, Category.query.count()))
+        post.post_category_id = random.randint(1, Category.query.count())
         db.session.add(post)
 
     db.session.commit()
 
 
 # 增加虚拟评论
-def fake_comment(count=300):
-    pass
+def fake_comment(count=500):
+    # 增加已审批过的评论
+    for i in range(count):
+        comment = Comment()
+        comment.comment_user_id = random.randint(1, Category.query.count())
+        comment.comment_content = fake.sentence()
+        comment.comment_post_id = random.randint(1, Post.query.count())
+        comment.comment_status = 1
+        db.session.add(comment)
+
+    # 增加审核未通过的评论和管理员评论
+    salt = int(count * 0.1)
+    for i in range(salt):
+        comment = Comment()
+        comment.comment_user_id = random.randint(1, Category.query.count())
+        comment.comment_content = fake.sentence()
+        comment.comment_post_id = random.randint(1, Post.query.count())
+        comment.comment_status = 0
+        db.session.add(comment)
+
+        comment = Comment()
+        comment.comment_user_id = random.randint(1, Category.query.count())
+        comment.comment_content = fake.sentence()
+        comment.comment_post_id = random.randint(1, Post.query.count())
+        comment.comment_status = 1
+        comment.comment_from_admin = 1
+        db.session.add(comment)
+    db.session.commit()
+
+
+# 增加虚拟回复
+def fake_replies(count=1000):
+    user_name_list = User.query.with_entities(User.nick_name).all()
+    for i in range(count):
+        reply = Reply()
+        reply.reply_content = fake.sentence()
+        reply.reply_comment_id = random.randint(1, Comment.query.count())
+        reply.reply_from_user = random.choice(user_name_list)[0]
+        reply.reply_to_user = random.choice(user_name_list)[0]
+        db.session.add(reply)
+
+    db.session.commit()
+
+
+
+
+
 
 
