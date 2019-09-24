@@ -48,3 +48,4 @@ class DataBaseTestCase(BaseTestCase):
         self.setUp()
         for i in range(10):
             print('============RANDOM MOBILE IS=============== %s' % random_mobile())
+        print(User.query.filter_by(nick_name='JayChen').first().id)

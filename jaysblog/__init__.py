@@ -20,6 +20,7 @@ from jaysblog.settings import config
 from jaysblog.blueprints.auth_blueprint import auth_bp
 from jaysblog.blueprints.admin_blueprint import admin_bp
 from jaysblog.blueprints.blog_blueprint import blog_bp
+from jaysblog.blueprints.user_blueprint import user_bp
 from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user
 
 
@@ -30,7 +31,7 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    # register_logging(app, config_name)  # 注册日志处理器
+    register_logging(app, config_name)  # 注册日志处理器
     register_blueprints(app)  # 注册蓝图
     register_errors(app)  # 注册错误处理器
     register_extensions(app)  # 注册扩展(扩展初始化)
@@ -71,6 +72,7 @@ def register_blueprints(app):
     app.register_blueprint(blog_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(user_bp, url_prefix='/user')
 
 
 def register_errors(app):
