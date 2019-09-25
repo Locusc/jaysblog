@@ -22,6 +22,8 @@ class RET:
     DATABASE_COMMIT_ERROR = 4001
     DATABASE_SELECT_ERROR = 4002
 
+    REDIS_SAVE_ERROR = 4011
+    REDIS_GET_ERROR = 4012
 
     # DBERR = 4001
     # NODATA = 4002
@@ -53,6 +55,9 @@ error_map = {
 
     RET.DATABASE_SELECT_ERROR: u"数据库查询失败",
     RET.DATABASE_COMMIT_ERROR: u"数据库提交失败",
+
+    RET.REDIS_SAVE_ERROR: u'redis保存数据失败',
+    RET.REDIS_GET_ERROR: u'redis获取数据失败',
 
     # RET.DBERR: u"数据库查询错误",
     # RET.NODATA: u"无数据",

@@ -13,7 +13,7 @@ import unittest
 
 from flask import json
 
-from jaysblog import Category, User, db, Post
+from jaysblog import Category, User, db, Post, Comment, constants, Reply
 from jaysblog.utils.tools import random_mobile
 from tests_data.base import BaseTestCase
 
@@ -54,5 +54,23 @@ class DataBaseTestCase(BaseTestCase):
 
     def test_paginate(self):
         self.setUp()
-        paginate = Post.query.filter_by(post_status=1).paginate(1, 10, False)
-        print(len(paginate.items))
+        category_id = 1
+        paginate = Post.query.filter(Post.post_status == 1, Post.post_category_id == category_id if category_id else True).order_by(
+            Post.create_time.asc()).paginate(1, 10, False)
+        print(paginate.items)
+
+    def test_post_details(self):
+        self.setUp()
+        comment = Comment.query.filter_by(comment_status=1, comment_post_id=1).order_by(
+            Comment.create_time.desc()).paginate(
+            constants.DEFAULT_CURRENT_PAGE_NUM, constants.PAGE_MAX_COMMENT_MESSAGES, False)
+        comment_collection = []
+        for item in comment.items:
+            replies = Reply.query.filter_by(reply_comment_id=item.to_dict()['id']).all()
+            if replies is not []:
+                for reply in replies:
+                    print(reply.to_dict())
+                    item.to_dict()['comment_replies_collection'].append(reply.to_dict())
+            comment_collection.append(item.to_dict())
+
+        print(comment_collection)

@@ -99,6 +99,19 @@ class Post(BaseModel, db.Model):
         }
         return res_dict
 
+    def to_dict_details(self):
+        res_dict = {
+            "id": self.id,
+            "post_title": self.post_title,
+            "post_user_id": self.post_user_id,
+            "post_content": self.post_content,
+            "post_clicks": self.post_clicks,
+            "post_like_num": self.post_like_num,
+            "post_can_comment": self.post_can_comment,
+            "post_category": self.post_category.to_dict() if self.post_category else None,
+        }
+        return res_dict
+
 
 class Category(BaseModel, db.Model):
     __tablename__ = 'b_category'
@@ -111,7 +124,8 @@ class Category(BaseModel, db.Model):
     def to_dict(self):
         res_dict = {
             "id": self.id,
-            "cg_name": self.cg_name
+            "cg_name": self.cg_name,
+            "cg_posts_count": len(self.cg_posts) if self.cg_posts else 0
         }
         return res_dict
 
@@ -128,6 +142,22 @@ class Comment(BaseModel, db.Model):
     comment_post_id = db.Column(db.Integer, db.ForeignKey('b_posts.id'), nullable=False)  # 当前评论属于的文章id
     comment_reply = db.relationship('Reply', backref='reply_comment')  # 当前评论下的回复
 
+    def to_dict(self):
+        comment_replies = []
+        if self.comment_reply is not []:
+            for reply in self.comment_reply:
+                comment_replies.append(reply.to_dict())
+
+        res_dict = {
+            "id": self.id,
+            "comment_user_name": User.query.filter_by(id=self.comment_user_id).first().nick_name,
+            "comment_content": self.comment_content,
+            "comment_from_admin": self.comment_from_admin,
+            "comment_post_id": self.comment_post_id,
+            "comment_replies": comment_replies
+        }
+        return res_dict
+
 
 class Reply(BaseModel, db.Model):
     __tablename__ = 'b_reply'
@@ -138,6 +168,17 @@ class Reply(BaseModel, db.Model):
     reply_content = db.Column(db.Text, nullable=False)  # 回复的内容
 
     reply_comment_id = db.Column(db.Integer, db.ForeignKey('b_comments.id'), nullable=False)  # 当前回复属于的评论id
+
+    def to_dict(self):
+        res_dict = {
+            "id": self.id,
+            "reply_from_user": self.reply_from_user,
+            "reply_to_user": self.reply_to_user,
+            "reply_content": self.reply_content,
+            "reply_comment_id": self.reply_comment_id
+        }
+        return res_dict
+
 
 
 

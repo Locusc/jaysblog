@@ -38,7 +38,7 @@ def get_image_code():
         redis_store.set('ImageCodeId_%s' % image_code_id, text, constants.IMAGE_CODE_REDIS_EXPIRES)
     except Exception as e:
         current_app.logger.error(e)
-        return make_response(jsonify(code=RET.DATABASE_COMMIT_ERROR, msg='保存图片验证码信息到redis服务器失败'))
+        return make_response(jsonify(code=RET.REDIS_SAVE_ERROR, msg='保存图片验证码信息到redis服务器失败'))
 
     response = make_response(image)
     # 设置content-type 请求返回body数据类型
