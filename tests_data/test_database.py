@@ -11,7 +11,9 @@
 import random
 import unittest
 
-from jaysblog import Category, User, db
+from flask import json
+
+from jaysblog import Category, User, db, Post
 from jaysblog.utils.tools import random_mobile
 from tests_data.base import BaseTestCase
 
@@ -49,3 +51,8 @@ class DataBaseTestCase(BaseTestCase):
         for i in range(10):
             print('============RANDOM MOBILE IS=============== %s' % random_mobile())
         print(User.query.filter_by(nick_name='JayChen').first().id)
+
+    def test_paginate(self):
+        self.setUp()
+        paginate = Post.query.filter_by(post_status=1).paginate(1, 10, False)
+        print(len(paginate.items))

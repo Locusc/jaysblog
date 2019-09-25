@@ -82,7 +82,22 @@ class Post(BaseModel, db.Model):
     post_can_comment = db.Column(db.Integer, default=1)  # 当前文章是否可以被评论
 
     post_comments = db.relationship('Comment', backref='comment_post')  # 当前文章的评论
+    post_category = db.relationship('Category', back_populates='cg_posts')
     post_category_id = db.Column(db.Integer, db.ForeignKey('b_category.id'), nullable=False)  # 文章类型
+
+    def to_dict(self):
+        res_dict = {
+            "id": self.id,
+            "post_title": self.post_title,
+            "post_user_id": self.post_user_id,
+            "post_digest": self.post_digest if self.post_digest else "",
+            "post_clicks": self.post_clicks,
+            "post_like_num": self.post_like_num,
+            "post_index_image_url": self.post_index_image_url if self.post_index_image_url else "",
+            "post_category": self.post_category.to_dict() if self.post_category else None,
+            "post_comments_count": len(self.post_comments) if self.post_comments else 0,
+        }
+        return res_dict
 
 
 class Category(BaseModel, db.Model):
@@ -91,7 +106,14 @@ class Category(BaseModel, db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 分类编号
     cg_name = db.Column(db.String(64), nullable=False, unique=True)  # 分类名称
 
-    cg_posts = db.relationship('Post', backref='post_category')  # 分类下的文章
+    cg_posts = db.relationship('Post', back_populates='post_category')  # 分类下的文章
+
+    def to_dict(self):
+        res_dict = {
+            "id": self.id,
+            "cg_name": self.cg_name
+        }
+        return res_dict
 
 
 class Comment(BaseModel, db.Model):
