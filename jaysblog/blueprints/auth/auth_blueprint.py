@@ -67,6 +67,9 @@ def login():
     if not user:
         return jsonify(code=RET.USER_NOT_EXIST, msg='用户不存在')
 
+    if user.is_delete == 0:
+        return jsonify(code=RET.USER_LOCK_ERROR, msg='该用户已被禁止登陆,请联系管理员')
+
     if user.check_password(password) is False:
         return jsonify(code=RET.USER_PASSWORD_ERROR, msg='密码错误')
 
@@ -99,22 +102,34 @@ def register():
     if not all([nick_name, password, mobile, email, desc]):
         return jsonify(code=RET.PARAMS_MISSING_ERROR, msg='参数缺失错误')
 
-    user = User()
-    user.desc = desc
-    user.email = email
-    user.mobile = mobile
-    user.password = password
-    user.nick_name = nick_name
+    try:
+        user = User.query.filter(User.nick_name == nick_name or
+                                 User.mobile == mobile or
+                                 User.email == email)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(code=RET.DATABASE_SELECT_ERROR, msg='查询数据库数据错误')
+    if user:
+        if user.nick_name == nick_name:
+            return jsonify(code=RET.USER_REGISTER_ERROR, msg='用户名已存在')
+        elif user.mobile == mobile:
+            return jsonify(code=RET.USER_REGISTER_ERROR, msg='联系电话已存在')
+        elif user.email == email:
+            return jsonify(code=RET.USER_REGISTER_ERROR, msg='邮箱已存在')
+    else:
+        user.desc = desc
+        user.email = email
+        user.mobile = mobile
+        user.password = password
+        user.nick_name = nick_name
 
     try:
         db.session.add(user)
-        # db.session.flush()
         db.session.commit()
     except Exception as e:
         current_app.logger.error(e)
         db.session.rollback()
         return jsonify(code=RET.DATABASE_COMMIT_ERROR, msg='注册用户信息失败')
-    # print('user_id========================================================================== %s' % user.id)
     try:
         login_user(user)
     except Exception as e:

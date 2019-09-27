@@ -17,10 +17,10 @@ from flask_wtf.csrf import generate_csrf
 from jaysblog.extensions import db, manager, cache, moment, login_manager, redis_store, csrf_protect
 from jaysblog.models import User, Category, Comment, Reply, Post
 from jaysblog.settings import config
-from jaysblog.blueprints.auth_blueprint import auth_bp
-from jaysblog.blueprints.admin_blueprint import admin_bp
-from jaysblog.blueprints.blog_blueprint import blog_bp
-from jaysblog.blueprints.user_blueprint import user_bp
+from jaysblog.blueprints.auth.auth_blueprint import auth_bp
+from jaysblog.blueprints.admin.admin_blueprint import admin_bp
+from jaysblog.blueprints.blog.blog_blueprint import blog_bp
+from jaysblog.blueprints.user.user_blueprint import user_bp
 from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user
 
 

@@ -146,7 +146,8 @@ class Comment(BaseModel, db.Model):
         comment_replies = []
         if self.comment_reply is not []:
             for reply in self.comment_reply:
-                comment_replies.append(reply.to_dict())
+                if reply.reply_status == 1:
+                    comment_replies.append(reply.to_dict())
 
         res_dict = {
             "id": self.id,
@@ -166,6 +167,7 @@ class Reply(BaseModel, db.Model):
     reply_from_user = db.Column(db.String(32), nullable=False)  # 谁回复的
     reply_to_user = db.Column(db.String(32), nullable=False)  # 回复给谁的
     reply_content = db.Column(db.Text, nullable=False)  # 回复的内容
+    reply_status = db.Column(db.Integer, default=0)  # 回复是否通过审核  -1不可用 0:审核中 1:审核通过
 
     reply_comment_id = db.Column(db.Integer, db.ForeignKey('b_comments.id'), nullable=False)  # 当前回复属于的评论id
 

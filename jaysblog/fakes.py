@@ -115,6 +115,7 @@ def fake_replies(count=1000):
         reply.reply_comment_id = random.randint(1, Comment.query.count())
         reply.reply_from_user = random.choice(user_name_list)[0]
         reply.reply_to_user = random.choice(user_name_list)[0]
+        reply.reply_status = 1
         db.session.add(reply)
 
     db.session.commit()

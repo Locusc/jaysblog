@@ -18,6 +18,8 @@ class RET:
     USER_LOGOUT_ERROR = 3002
     USER_NOT_EXIST = 3003
     USER_PASSWORD_ERROR = 3004
+    USER_LOCK_ERROR = 3005
+    USER_REGISTER_ERROR = 3006
 
     DATABASE_COMMIT_ERROR = 4001
     DATABASE_SELECT_ERROR = 4002
@@ -52,12 +54,14 @@ error_map = {
     RET.USER_LOGOUT_ERROR: u"用户退出失败",
     RET.USER_NOT_EXIST: u"用户不存在",
     RET.USER_PASSWORD_ERROR: u"用户密码错误",
+    RET.USER_LOCK_ERROR: u"锁定用户",
+    RET.USER_REGISTER_ERROR: u"用户注册错误",
 
     RET.DATABASE_SELECT_ERROR: u"数据库查询失败",
     RET.DATABASE_COMMIT_ERROR: u"数据库提交失败",
 
-    RET.REDIS_SAVE_ERROR: u'redis保存数据失败',
-    RET.REDIS_GET_ERROR: u'redis获取数据失败',
+    RET.REDIS_SAVE_ERROR: u'REDIS保存数据失败',
+    RET.REDIS_GET_ERROR: u'REDIS获取数据失败',
 
     # RET.DBERR: u"数据库查询错误",
     # RET.NODATA: u"无数据",

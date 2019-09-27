@@ -9,16 +9,16 @@
 """
 
 from flask import Blueprint, request, jsonify, current_app
-from flask_login import login_required
-from jaysblog import constants, Post, Comment
+from flask_login import login_required, current_user
+from jaysblog import constants, Post, Comment, db
 from jaysblog import Category
 from jaysblog.utils.response_code import RET
 
 blog_bp = Blueprint('blog_blueprint', __name__)
 
 
+# 获取分类列表
 @blog_bp.route('/category', methods=['GET', 'POST'])
-@login_required
 def get_category_list():
     page = request.json.get('pageSize', constants.DEFAULT_CURRENT_PAGE_NUM)
     currentPage = request.json.get('currentPage', constants.PAGE_MAX_CATEGORY_MESSAGES)
@@ -45,8 +45,8 @@ def get_category_list():
     return jsonify(code=RET.OK, msg='查询分类列表成功', data=data)
 
 
+# 获取博文列表
 @blog_bp.route('/post', methods=['GET', 'POST'])
-@login_required
 def get_post_list():
     category_id = request.json.get("category_id")
     page = request.json.get("pageSize", constants.DEFAULT_CURRENT_PAGE_NUM)
@@ -78,8 +78,8 @@ def get_post_list():
     return jsonify(code=RET.OK, msg='查询文章列表成功', data=data)
 
 
+# 获取博文详情
 @blog_bp.route('/post/details/<int:post_id>', methods=['GET'])
-@login_required
 def get_post_details(post_id):
 
     if not all([post_id]):
@@ -112,6 +112,33 @@ def get_post_details(post_id):
 
     return jsonify(code=RET.OK, msg='查询文章详情成功', data=data)
 
+
+# 评论
+@blog_bp.route('/put/comment', methods=['POST'])
+@login_required
+def put_comment():
+    json_data = request.json
+    comment_content = json_data['comment_content']
+    comment_post_id = json_data['comment_post_id']
+
+    if not all([comment_content, comment_post_id]):
+        return jsonify(code=RET.PARAMS_MISSING_ERROR, msg='参数缺失错误')
+
+    comment = Comment()
+    comment.comment_content = comment_content
+    comment.comment_post_id = comment_post_id
+    comment.comment_user_id = current_user.user_id
+    comment.comment_from_admin = 1 if current_user.is_admin else 0
+    comment.comment_status = 0
+
+    try:
+        db.session.commint()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(code=RET.DATABASE_COMMIT_ERROR, msg='提交评论失败')
+
+    return jsonify(code=RET.OK, msg='评论成功')
 
 
 
