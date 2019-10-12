@@ -182,5 +182,22 @@ class Reply(BaseModel, db.Model):
         return res_dict
 
 
+class Journey(BaseModel, db.Model):
+    __tablename__ = 'b_journey'
+
+    id = db.Column(db.Integer, primary_key=True)  # 历程id
+    journey_title = db.Column(db.String(32), nullable=False)  # 历程标题
+    journey_desc = db.Column(db.Text, nullable=False)  # 历程详情
+    journey_time = db.Column(db.DateTime, default=datetime.now)  # 历程时间
+
+    def to_dict(self):
+        res_dict = {
+            "id": self.id,
+            "journey_title": self.journey_title,
+            "journey_desc": self.journey_desc,
+            "journey_time": self.journey_time
+        }
+        return res_dict
+
 
 

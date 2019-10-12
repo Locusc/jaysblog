@@ -14,6 +14,7 @@ import unittest
 from flask import json
 
 from jaysblog import Category, User, db, Post, Comment, constants, Reply
+from jaysblog.models import Journey
 from jaysblog.utils.tools import random_mobile
 from tests_data.base import BaseTestCase
 
@@ -74,3 +75,11 @@ class DataBaseTestCase(BaseTestCase):
             comment_collection.append(item.to_dict())
 
         print(comment_collection)
+
+    def test_journey(self):
+        self.setUp()
+        journey_list = Journey.query.order_by(Journey.journey_time.asc()).all()
+        collection = []
+        for data in journey_list:
+            collection.append(data.to_dict())
+        print(collection)

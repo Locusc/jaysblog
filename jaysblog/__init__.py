@@ -21,7 +21,8 @@ from jaysblog.blueprints.auth.auth_blueprint import auth_bp
 from jaysblog.blueprints.admin.admin_blueprint import admin_bp
 from jaysblog.blueprints.blog.blog_blueprint import blog_bp
 from jaysblog.blueprints.user.user_blueprint import user_bp
-from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user
+from jaysblog.blueprints.blog.journey_blueprint import journey_bp
+from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user,fake_journey
 
 
 def create_app(config_name=None):
@@ -31,7 +32,7 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    # register_logging(app, config_name)  # 注册日志处理器
+    register_logging(app, config_name)  # 注册日志处理器
     register_blueprints(app)  # 注册蓝图
     register_errors(app)  # 注册错误处理器
     register_extensions(app)  # 注册扩展(扩展初始化)
@@ -73,6 +74,7 @@ def register_blueprints(app):
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(journey_bp, url_prefix='/journey')
 
 
 def register_errors(app):
@@ -183,8 +185,9 @@ def register_commands(app):
     @click.option('--category', default=10, help='Quantity of categories, default is 10.')
     @click.option('--post', default=50, help='Quantity of posts, default is 50.')
     @click.option('--comment', default=500, help='Quantity of comments, default is 500.')
-    @click.option('--reply', default=1000, help='Quantity of comments, default is 1000.')
-    def forge(user, category, post, comment, reply):
+    @click.option('--reply', default=1000, help='Quantity of reply, default is 1000.')
+    @click.option('--journey', default=20, help='Quantity of journey, default is 20.')
+    def forge(user, category, post, comment, reply, journey):
         """Generate fake data."""
         db.drop_all()
         db.create_all()
@@ -206,6 +209,9 @@ def register_commands(app):
 
         click.echo('Generating the replies %s.' % reply)
         fake_replies(reply)
+
+        click.echo('Generating the journey %s.' % journey)
+        fake_journey(journey)
 
         click.echo('done')
 

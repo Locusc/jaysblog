@@ -13,7 +13,7 @@ from faker import Faker
 
 from sqlalchemy.exc import IntegrityError
 from jaysblog import db
-from jaysblog.models import Comment, Category, User, Post, Reply
+from jaysblog.models import Comment, Category, User, Post, Reply, Journey
 from jaysblog.utils.tools import random_mobile
 
 fake = Faker()
@@ -117,6 +117,16 @@ def fake_replies(count=1000):
         reply.reply_to_user = random.choice(user_name_list)[0]
         reply.reply_status = 1
         db.session.add(reply)
+
+    db.session.commit()
+
+
+def fake_journey(count=20):
+    for i in range(count):
+        journey = Journey()
+        journey.journey_desc = fake.sentence()
+        journey.journey_title = fake.name()
+        db.session.add(journey)
 
     db.session.commit()
 
