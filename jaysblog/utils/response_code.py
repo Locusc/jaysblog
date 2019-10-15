@@ -13,6 +13,8 @@ class RET:
     OK = 200
 
     PARAMS_MISSING_ERROR = 2001
+    IMAGE_CODE_OVERDUE_ERROR = 2002
+    IMAGE_CODE_INPUT_ERROR = 2003
 
     USER_LOGIN_ERROR = 3001
     USER_LOGOUT_ERROR = 3002
@@ -49,6 +51,8 @@ error_map = {
     RET.OK: u"成功",
 
     RET.PARAMS_MISSING_ERROR: u"参数缺失错误",
+    RET.IMAGE_CODE_OVERDUE_ERROR: u"图片验证码过期错误",
+    RET.IMAGE_CODE_INPUT_ERROR: u"图片验证码输入错误",
 
     RET.USER_LOGIN_ERROR: u"用户登陆失败",
     RET.USER_LOGOUT_ERROR: u"用户退出失败",

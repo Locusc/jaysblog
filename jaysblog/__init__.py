@@ -22,7 +22,7 @@ from jaysblog.blueprints.admin.admin_blueprint import admin_bp
 from jaysblog.blueprints.blog.blog_blueprint import blog_bp
 from jaysblog.blueprints.user.user_blueprint import user_bp
 from jaysblog.blueprints.blog.journey_blueprint import journey_bp
-from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user,fake_journey
+from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user, fake_journey
 
 
 def create_app(config_name=None):
@@ -72,9 +72,9 @@ def register_extensions(app):
 def register_blueprints(app):
     app.register_blueprint(blog_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(user_bp, url_prefix='/user')
-    app.register_blueprint(journey_bp, url_prefix='/journey')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(user_bp, url_prefix='/api/user')
+    app.register_blueprint(journey_bp, url_prefix='/api/journey')
 
 
 def register_errors(app):

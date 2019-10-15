@@ -47,16 +47,31 @@ def get_image_code():
     return response
 
 
-@auth_bp.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     if current_user.is_authenticated:
-        return jsonify(code=RET.OK, msg='当前用户已通过认证')
+        if current_user.is_admin is True:
+            currentAuthority = 'admin'
+        else:
+            currentAuthority = 'user'
+        return jsonify(code=RET.OK, msg='当前用户已通过认证', currentAuthority=currentAuthority, type='account')
     json_data = request.json
-    nick_name = json_data['username']
+    nick_name = json_data['userName']
     password = json_data['password']
-    remember = json_data['remember']
-    if not all([nick_name, password]):
+    remember = json_data['autoLogin']
+    image_code = json_data['verificationCode']
+    image_code_id = json_data['imageCodeId']
+
+    if not all([nick_name, password, image_code, image_code_id]):
         return jsonify(code=RET.PARAMS_MISSING_ERROR, msg='参数错误,缺少参数')
+
+    redis_image_code = redis_store.get("ImageCodeId_"+str(image_code_id))
+    # 判断是否过期
+    if not redis_image_code:
+        return jsonify(code=RET.IMAGE_CODE_OVERDUE_ERROR, msg="图片验证码已过期")
+    # 判断图片验证码是否正确
+    if redis_image_code.lower() != bytes(image_code.lower(), encoding='utf-8'):
+        return jsonify(code=RET.IMAGE_CODE_INPUT_ERROR, msg="图片验证码输入错误")
 
     try:
         user = User.query.filter_by(nick_name=nick_name).first()
@@ -88,7 +103,12 @@ def login():
         db.session.rollback()
         return jsonify(code=RET.DATABASE_COMMIT_ERROR, msg='更新用户登陆时间错误')
 
-    return jsonify(code=RET.OK, msg='登陆成功')
+    if user.is_admin is True:
+        currentAuthority = 'admin'
+    else:
+        currentAuthority = 'user'
+
+    return jsonify(code=RET.OK, msg='登陆成功', currentAuthority=currentAuthority)
 
 
 @auth_bp.route('/register', methods=['POST'])
