@@ -54,7 +54,9 @@ def login():
             currentAuthority = 'admin'
         else:
             currentAuthority = 'user'
-        return jsonify(code=RET.OK, msg='当前用户已通过认证', currentAuthority=currentAuthority, type='account')
+        return jsonify(code=RET.OK, msg='当前用户已通过认证', currentAuthority=currentAuthority, type='account',
+                       user_id=current_user.id)
+
     json_data = request.json
     nick_name = json_data['userName']
     password = json_data['password']
@@ -108,7 +110,21 @@ def login():
     else:
         currentAuthority = 'user'
 
-    return jsonify(code=RET.OK, msg='登陆成功', currentAuthority=currentAuthority)
+    return jsonify(code=RET.OK, msg='登陆成功', currentAuthority=currentAuthority, user_id=user.id)
+
+
+# 安全考虑登陆后获取用户信息 不在登陆时直接返回
+@auth_bp.route('/getUserMessages', methods=['GET'])
+@login_required
+def get_user_messages():
+    try:
+        user = current_user.to_dict()
+        print(user)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(RET.DATABASE_SELECT_ERROR, msg='获取当前用户信息失败')
+
+    return jsonify(code=RET.OK, msg='查询用户信息成功', data=user)
 
 
 @auth_bp.route('/register', methods=['POST'])

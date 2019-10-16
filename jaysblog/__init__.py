@@ -32,7 +32,7 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    register_logging(app, config_name)  # 注册日志处理器
+    # register_logging(app, config_name)  # 注册日志处理器
     register_blueprints(app)  # 注册蓝图
     register_errors(app)  # 注册错误处理器
     register_extensions(app)  # 注册扩展(扩展初始化)

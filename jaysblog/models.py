@@ -66,6 +66,17 @@ class User(BaseModel, db.Model, UserMixin):
         """
         return check_password_hash(self.password_hash, password)
 
+    def to_dict(self):
+        res_dict = {
+            "id": self.id,
+            "nick_name": self.nick_name,
+            "email": self.email,
+            "desc": self.desc,
+            "avatar_url": self.avatar_url,
+            "gender": self.gender
+        }
+        return res_dict
+
 
 class Post(BaseModel, db.Model):
     __tablename__ = 'b_posts'

@@ -78,8 +78,11 @@ class DataBaseTestCase(BaseTestCase):
 
     def test_journey(self):
         self.setUp()
-        journey_list = Journey.query.order_by(Journey.journey_time.asc()).all()
-        collection = []
-        for data in journey_list:
-            collection.append(data.to_dict())
-        print(collection)
+        # journey_list = Journey.query.order_by(Journey.journey_time.asc()).all()
+        # collection = []
+        # for data in journey_list:
+        #     collection.append(data.to_dict())
+        # print(collection)
+
+        user = User.query.filter_by(id=1).first()
+        print(user.to_dict())
