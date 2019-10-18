@@ -115,16 +115,17 @@ def login():
 
 # 安全考虑登陆后获取用户信息 不在登陆时直接返回
 @auth_bp.route('/getUserMessages', methods=['GET'])
-@login_required
 def get_user_messages():
-    try:
-        user = current_user.to_dict()
-        print(user)
-    except Exception as e:
-        current_app.logger.error(e)
-        return jsonify(RET.DATABASE_SELECT_ERROR, msg='获取当前用户信息失败')
+    if current_user.is_authenticated:
+        try:
+            user = current_user.to_dict()
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(code=RET.DATABASE_SELECT_ERROR, msg='获取当前用户信息失败')
 
-    return jsonify(code=RET.OK, msg='查询用户信息成功', data=user)
+        return jsonify(code=RET.OK, msg='查询用户信息成功', data=user)
+    else:
+        return jsonify(code=RET.USER_LOGIN_ERROR, msg='未登陆用户')
 
 
 @auth_bp.route('/register', methods=['POST'])

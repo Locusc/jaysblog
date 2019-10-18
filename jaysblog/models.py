@@ -15,8 +15,8 @@ from flask_login import UserMixin
 
 class BaseModel(object):
     # 模型基类 为所有模型添加创建和更新的时间
-    create_time = db.Column(db.DateTime, default=datetime.now)
-    update_time = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    create_time = db.Column(db.DateTime, default=datetime.utcnow)
+    update_time = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class User(BaseModel, db.Model, UserMixin):
@@ -37,7 +37,7 @@ class User(BaseModel, db.Model, UserMixin):
     desc = db.Column(db.Text)  # 个人简介
     avatar_url = db.Column(db.String(256))  # 用户头像路径
     is_admin = db.Column(db.Boolean, default=False)  # 是否为管理员
-    last_login_time = db.Column(db.DateTime, default=datetime.now)  # 最后一次登陆时间
+    last_login_time = db.Column(db.DateTime, default=datetime.utcnow)  # 最后一次登陆时间
     is_delete = db.Column(db.Integer, default=1)  # 用户是否被删除 1正常  0被删除
     gender = db.Column(
         db.Enum(
@@ -107,6 +107,8 @@ class Post(BaseModel, db.Model):
             "post_index_image_url": self.post_index_image_url if self.post_index_image_url else "",
             "post_category": self.post_category.to_dict() if self.post_category else None,
             "post_comments_count": len(self.post_comments) if self.post_comments else 0,
+            "post_create_time": self.create_time,
+            "post_update_time": self.update_time,
         }
         return res_dict
 
@@ -119,6 +121,7 @@ class Post(BaseModel, db.Model):
             "post_clicks": self.post_clicks,
             "post_like_num": self.post_like_num,
             "post_can_comment": self.post_can_comment,
+            "post_create_time": self.create_time,
             "post_category": self.post_category.to_dict() if self.post_category else None,
         }
         return res_dict
@@ -199,7 +202,7 @@ class Journey(BaseModel, db.Model):
     id = db.Column(db.Integer, primary_key=True)  # 历程id
     journey_title = db.Column(db.String(32), nullable=False)  # 历程标题
     journey_desc = db.Column(db.Text, nullable=False)  # 历程详情
-    journey_time = db.Column(db.DateTime, default=datetime.now)  # 历程时间
+    journey_time = db.Column(db.DateTime, default=datetime.utcnow)  # 历程时间
 
     def to_dict(self):
         res_dict = {

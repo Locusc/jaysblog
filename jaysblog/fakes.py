@@ -69,6 +69,7 @@ def fake_posts(count=50):
         post.post_title = fake.sentence()
         post.post_user_id = User.query.get(1).id
         post.post_content = fake.text(2000)
+        post.post_digest = fake.text(200)
         post.post_category_id = random.randint(1, Category.query.count())
         db.session.add(post)
 

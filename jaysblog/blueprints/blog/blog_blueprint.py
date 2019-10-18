@@ -20,13 +20,13 @@ blog_bp = Blueprint('blog_blueprint', __name__)
 # 获取分类列表
 @blog_bp.route('/category', methods=['GET', 'POST'])
 def get_category_list():
-    page = request.json.get('pageSize', constants.DEFAULT_CURRENT_PAGE_NUM)
-    currentPage = request.json.get('currentPage', constants.PAGE_MAX_CATEGORY_MESSAGES)
-    if not all([page, currentPage]):
+    pageSize = request.json.get('pageSize', constants.DEFAULT_CURRENT_PAGE_NUM)
+    current = request.json.get('current', constants.PAGE_MAX_CATEGORY_MESSAGES)
+    if not all([pageSize, current]):
         return jsonify(code=RET.PARAMS_MISSING_ERROR, msg='参数缺失错误')
 
     try:
-        paginate = Category.query.paginate(currentPage, page, False)
+        paginate = Category.query.paginate(current, pageSize, False)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(code=RET.DATABASE_SELECT_ERROR, msg='查询数据库数据错误')
@@ -35,7 +35,7 @@ def get_category_list():
     for item in paginate.items:
         collection.append(item.to_dict())
     data = {
-        "pagination": {
+        "paginates": {
             "current": paginate.page,
             "pageSize": paginate.per_page,
             "total": paginate.total
@@ -49,16 +49,16 @@ def get_category_list():
 @blog_bp.route('/post', methods=['GET', 'POST'])
 def get_post_list():
     category_id = request.json.get("category_id")
-    page = request.json.get("pageSize", constants.DEFAULT_CURRENT_PAGE_NUM)
-    currentPage = request.json.get("currentPage", constants.PAGE_MAX_POST_MESSAGES)
+    pageSize = request.json.get("pageSize", constants.DEFAULT_CURRENT_PAGE_NUM)
+    current = request.json.get("current", constants.PAGE_MAX_POST_MESSAGES)
 
-    if not all([page, currentPage]):
+    if not all([pageSize, current]):
         return jsonify(code=RET.PARAMS_MISSING_ERROR, msg='参数缺失错误')
 
     try:
         paginate = Post.query.filter(Post.post_status == 1,
                                      Post.post_category_id == category_id if category_id else True
-                                     ).order_by(Post.create_time.asc()).paginate(1, 10, False)
+                                     ).order_by(Post.create_time.asc()).paginate(current, pageSize, False)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(code=RET.DATABASE_SELECT_ERROR, msg='查询数据库数据错误')
@@ -68,7 +68,7 @@ def get_post_list():
         collection.append(item.to_dict())
 
     data = {
-        "pagination": {
+        "paginates": {
             "current": paginate.page,
             "pageSize": paginate.per_page,
             "total": paginate.total
@@ -101,7 +101,7 @@ def get_post_details(post_id):
     data = {
         "post": post.to_dict_details(),
         "comments": {
-            "pagination": {
+            "paginates": {
                 "current": comment.page,
                 "pageSize": comment.per_page,
                 "total": comment.total
