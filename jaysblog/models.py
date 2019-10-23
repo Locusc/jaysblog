@@ -96,6 +96,14 @@ class Post(BaseModel, db.Model):
     post_category = db.relationship('Category', back_populates='cg_posts')
     post_category_id = db.Column(db.Integer, db.ForeignKey('b_category.id'), nullable=False)  # 文章类型
 
+    def get_comment_length(self):
+        comments = []
+        if self.post_comments is not []:
+            for comment in self.post_comments:
+                if comment.comment_status == 1:
+                    comments.append(comment)
+        return len(comments)
+
     def to_dict(self):
         res_dict = {
             "id": self.id,
@@ -106,7 +114,7 @@ class Post(BaseModel, db.Model):
             "post_like_num": self.post_like_num,
             "post_index_image_url": self.post_index_image_url if self.post_index_image_url else "",
             "post_category": self.post_category.to_dict() if self.post_category else None,
-            "post_comments_count": len(self.post_comments) if self.post_comments else 0,
+            "post_comments_count": self.get_comment_length(),
             "post_create_time": self.create_time,
             "post_update_time": self.update_time,
         }
@@ -123,6 +131,7 @@ class Post(BaseModel, db.Model):
             "post_can_comment": self.post_can_comment,
             "post_create_time": self.create_time,
             "post_category": self.post_category.to_dict() if self.post_category else None,
+            "post_comments_count":  self.get_comment_length(),
         }
         return res_dict
 
@@ -169,7 +178,9 @@ class Comment(BaseModel, db.Model):
             "comment_content": self.comment_content,
             "comment_from_admin": self.comment_from_admin,
             "comment_post_id": self.comment_post_id,
-            "comment_replies": comment_replies
+            "comment_replies": comment_replies,
+            "comment_create_time": self.create_time,
+            "comment_update_time": self.update_time,
         }
         return res_dict
 
@@ -191,7 +202,9 @@ class Reply(BaseModel, db.Model):
             "reply_from_user": self.reply_from_user,
             "reply_to_user": self.reply_to_user,
             "reply_content": self.reply_content,
-            "reply_comment_id": self.reply_comment_id
+            "reply_comment_id": self.reply_comment_id,
+            "reply_create_time": self.create_time,
+            "reply_update_time": self.update_time,
         }
         return res_dict
 

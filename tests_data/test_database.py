@@ -84,5 +84,10 @@ class DataBaseTestCase(BaseTestCase):
         #     collection.append(data.to_dict())
         # print(collection)
 
-        user = User.query.filter_by(id=1).first()
-        print(user.to_dict())
+        comment = Comment.query.filter_by(comment_status=1, comment_post_id=1).order_by(
+            Comment.create_time.desc()).paginate(
+            constants.DEFAULT_CURRENT_PAGE_NUM, constants.PAGE_MAX_COMMENT_MESSAGES, False)
+        collection = []
+        for item in comment.items:
+            collection.append(item.to_dict())
+        print(len(collection))
