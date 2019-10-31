@@ -32,9 +32,10 @@ class User(BaseModel, db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)  # 用户id
     nick_name = db.Column(db.String(32), unique=True, nullable=False)  # 用户名
     password_hash = db.Column(db.String(128), nullable=False)  # 用户密码
-    mobile = db.Column(db.String(11), unique=True, nullable=False)  # 手机号码
+    mobile = db.Column(db.String(11), unique=True)  # 手机号码
     email = db.Column(db.String(64), unique=True, nullable=True)  # 邮箱
     desc = db.Column(db.Text)  # 个人简介
+    location = db.Column(db.String(128))  # 地址
     avatar_url = db.Column(db.String(256))  # 用户头像路径
     is_admin = db.Column(db.Boolean, default=False)  # 是否为管理员
     last_login_time = db.Column(db.DateTime, default=datetime.utcnow)  # 最后一次登陆时间
@@ -73,7 +74,8 @@ class User(BaseModel, db.Model, UserMixin):
             "email": self.email,
             "desc": self.desc,
             "avatar_url": self.avatar_url,
-            "gender": self.gender
+            "gender": self.gender,
+            "is_admin": self.is_admin,
         }
         return res_dict
 
@@ -226,5 +228,26 @@ class Journey(BaseModel, db.Model):
         }
         return res_dict
 
+
+class MessageBoard(BaseModel, db.Model):
+    __tablename__ = 'b_board'
+
+    id = db.Column(db.Integer, primary_key=True)  # 留言板id
+    board_user = db.Column(db.String(32), nullable=False)  # 留言用户
+    board_desc = db.Column(db.Text, nullable=False)  # 留言内容
+    board_status = db.Column(db.Integer, nullable=False, default=0)  # 留言状态 -1不可用 0:审核中 1:审核通过
+    board_email = db.Column(db.String(50), nullable=False)  # 留言回复邮箱
+
+    def to_dict(self):
+        res_dict = {
+            "id": self.id,
+            "board_user": self.board_user,
+            "board_desc": self.board_desc,
+            "board_status": self.board_status,
+            "board_create_time": self.create_time,
+            "board_update_time": self.update_time,
+            "board_email": self.board_email,
+        }
+        return res_dict
 
 

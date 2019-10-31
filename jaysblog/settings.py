@@ -14,7 +14,7 @@ import os
 class BaseConfig(object):
 
     # 添加mysql数据库的配置
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@127.0.0.1:3306/jaysblog?charset=utf8"
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:rootadmin@127.0.0.1:3306/jaysblog?charset=utf8"
     # 动态追踪设置 追踪对象的修改并返回信号 会额外占用内存
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # 设置是否在每次连接结束后自动提交数据库中的变动。

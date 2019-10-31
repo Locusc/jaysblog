@@ -22,7 +22,9 @@ from jaysblog.blueprints.admin.admin_blueprint import admin_bp
 from jaysblog.blueprints.blog.blog_blueprint import blog_bp
 from jaysblog.blueprints.user.user_blueprint import user_bp
 from jaysblog.blueprints.blog.journey_blueprint import journey_bp
-from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user, fake_journey
+from jaysblog.blueprints.blog.board_blueprint import board_bp
+from jaysblog.blueprints.oauth.oauth_blueprint import oauth_bp
+from jaysblog.fakes import fake_categories, fake_comment, fake_posts, fake_replies, fake_admin, fake_user, fake_journey, fake_board
 
 
 def create_app(config_name=None):
@@ -75,6 +77,8 @@ def register_blueprints(app):
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(user_bp, url_prefix='/api/user')
     app.register_blueprint(journey_bp, url_prefix='/api/journey')
+    app.register_blueprint(board_bp, url_prefix='/api/board')
+    app.register_blueprint(oauth_bp, url_prefix='/api/oauth')
 
 
 def register_errors(app):
@@ -187,7 +191,8 @@ def register_commands(app):
     @click.option('--comment', default=500, help='Quantity of comments, default is 500.')
     @click.option('--reply', default=1000, help='Quantity of reply, default is 1000.')
     @click.option('--journey', default=20, help='Quantity of journey, default is 20.')
-    def forge(user, category, post, comment, reply, journey):
+    @click.option('--board', default=50, help='Quantity of board, default is 50.')
+    def forge(user, category, post, comment, reply, journey, board):
         """Generate fake data."""
         db.drop_all()
         db.create_all()
@@ -212,6 +217,9 @@ def register_commands(app):
 
         click.echo('Generating the journey %s.' % journey)
         fake_journey(journey)
+
+        click.echo('Generating the board %s.' % board)
+        fake_board(board)
 
         click.echo('done')
 

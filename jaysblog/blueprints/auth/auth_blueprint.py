@@ -50,11 +50,7 @@ def get_image_code():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     if current_user.is_authenticated:
-        if current_user.is_admin is True:
-            currentAuthority = 'admin'
-        else:
-            currentAuthority = 'user'
-        return jsonify(code=RET.OK, msg='当前用户已通过认证', currentAuthority=currentAuthority, type='account',
+        return jsonify(code=RET.OK, msg='当前用户已通过认证',
                        user_id=current_user.id)
 
     json_data = request.json
@@ -96,7 +92,7 @@ def login():
         current_app.logger.error(e)
         return jsonify(code=RET.USER_LOGIN_ERROR, msg='用户登陆失败')
 
-    user.last_login_time = datetime.now()
+    user.last_login_time = datetime.utcnow()
 
     try:
         db.session.commit()
@@ -105,12 +101,7 @@ def login():
         db.session.rollback()
         return jsonify(code=RET.DATABASE_COMMIT_ERROR, msg='更新用户登陆时间错误')
 
-    if user.is_admin is True:
-        currentAuthority = 'admin'
-    else:
-        currentAuthority = 'user'
-
-    return jsonify(code=RET.OK, msg='登陆成功', currentAuthority=currentAuthority, user_id=user.id)
+    return jsonify(code=RET.OK, msg='登陆成功', user_id=user.id)
 
 
 # 安全考虑登陆后获取用户信息 不在登陆时直接返回
@@ -133,32 +124,26 @@ def register():
     json_data = request.json
     nick_name = json_data['username']
     password = json_data['password']
-    mobile = json_data['mobile']
     email = json_data['email']
-    desc = json_data['desc']
-    if not all([nick_name, password, mobile, email, desc]):
+    if not all([nick_name, password, email]):
         return jsonify(code=RET.PARAMS_MISSING_ERROR, msg='参数缺失错误')
 
     try:
         user = User.query.filter(User.nick_name == nick_name or
-                                 User.mobile == mobile or
-                                 User.email == email)
+                                 User.email == email).first()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(code=RET.DATABASE_SELECT_ERROR, msg='查询数据库数据错误')
     if user:
         if user.nick_name == nick_name:
             return jsonify(code=RET.USER_REGISTER_ERROR, msg='用户名已存在')
-        elif user.mobile == mobile:
-            return jsonify(code=RET.USER_REGISTER_ERROR, msg='联系电话已存在')
         elif user.email == email:
             return jsonify(code=RET.USER_REGISTER_ERROR, msg='邮箱已存在')
     else:
-        user.desc = desc
         user.email = email
-        user.mobile = mobile
         user.password = password
         user.nick_name = nick_name
+        user.last_login_time = datetime.utcnow()
 
     try:
         db.session.add(user)
@@ -184,6 +169,7 @@ def logout():
         current_app.logger.error(e)
         return jsonify(code=RET.USER_LOGOUT_ERROR, msg='用户退出失败')
     return jsonify(code=RET.OK, msg='用户已退出')
+
 
 
 
