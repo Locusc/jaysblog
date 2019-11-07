@@ -129,17 +129,17 @@ def register():
         return jsonify(code=RET.PARAMS_MISSING_ERROR, msg='参数缺失错误')
 
     try:
-        user = User.query.filter(User.nick_name == nick_name or
-                                 User.email == email).first()
+        user = User.query.filter(User.email == email or User.nick_name == nick_name).first()
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(code=RET.DATABASE_SELECT_ERROR, msg='查询数据库数据错误')
     if user:
         if user.nick_name == nick_name:
             return jsonify(code=RET.USER_REGISTER_ERROR, msg='用户名已存在')
-        elif user.email == email:
+        if user.email == email:
             return jsonify(code=RET.USER_REGISTER_ERROR, msg='邮箱已存在')
     else:
+        user = User()
         user.email = email
         user.password = password
         user.nick_name = nick_name

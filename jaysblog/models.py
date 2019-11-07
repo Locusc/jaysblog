@@ -30,7 +30,7 @@ class User(BaseModel, db.Model, UserMixin):
     __tablename__ = 'b_users'
 
     id = db.Column(db.Integer, primary_key=True)  # 用户id
-    nick_name = db.Column(db.String(32), unique=True, nullable=False)  # 用户名
+    nick_name = db.Column(db.String(32), nullable=False)  # 用户名
     password_hash = db.Column(db.String(128), nullable=False)  # 用户密码
     mobile = db.Column(db.String(11), unique=True)  # 手机号码
     email = db.Column(db.String(64), unique=True, nullable=True)  # 邮箱
@@ -174,11 +174,14 @@ class Comment(BaseModel, db.Model):
                 if reply.reply_status == 1:
                     comment_replies.append(reply.to_dict())
 
+        user = User.query.filter_by(id=self.comment_user_id).first()
+
         res_dict = {
             "id": self.id,
-            "comment_user_name": User.query.filter_by(id=self.comment_user_id).first().nick_name,
+            "comment_user_name": user.nick_name,
+            "comment_user_avatar_url": user.avatar_url,
             "comment_content": self.comment_content,
-            "comment_from_admin": self.comment_from_admin,
+            "comment_from_admin": user.is_admin,
             "comment_post_id": self.comment_post_id,
             "comment_replies": comment_replies,
             "comment_create_time": self.create_time,
@@ -199,6 +202,9 @@ class Reply(BaseModel, db.Model):
     reply_comment_id = db.Column(db.Integer, db.ForeignKey('b_comments.id'), nullable=False)  # 当前回复属于的评论id
 
     def to_dict(self):
+
+        user = User.query.filter_by(nick_name=self.reply_from_user).first()
+
         res_dict = {
             "id": self.id,
             "reply_from_user": self.reply_from_user,
@@ -207,6 +213,8 @@ class Reply(BaseModel, db.Model):
             "reply_comment_id": self.reply_comment_id,
             "reply_create_time": self.create_time,
             "reply_update_time": self.update_time,
+            "reply_user_is_admin": user.is_admin,
+            "reply_user_avatar_url": user.avatar_url,
         }
         return res_dict
 
@@ -247,6 +255,22 @@ class MessageBoard(BaseModel, db.Model):
             "board_create_time": self.create_time,
             "board_update_time": self.update_time,
             "board_email": self.board_email,
+        }
+        return res_dict
+
+
+class UsersLikePosts(BaseModel, db.Model):
+    __tablename__ = 'b_users_like_posts'
+
+    id = db.Column(db.Integer, primary_key=True)  # 主键
+    user_id = db.Column(db.Integer, nullable=False)
+    user_like_post_id = db.Column(db.Integer, nullable=False)
+
+    def to_dict(self):
+        res_dict = {
+            "id": self.id,
+            "user_id": self.user_id,
+            "user_like_post_id": self.user_like_post_id,
         }
         return res_dict
 

@@ -15,7 +15,7 @@ import click
 from flask import Flask
 from flask_wtf.csrf import generate_csrf
 from jaysblog.extensions import db, manager, cache, moment, login_manager, redis_store, csrf_protect
-from jaysblog.models import User, Category, Comment, Reply, Post
+from jaysblog.models import User, Category, Comment, Reply, Post, UsersLikePosts
 from jaysblog.settings import config
 from jaysblog.blueprints.auth.auth_blueprint import auth_bp
 from jaysblog.blueprints.admin.admin_blueprint import admin_bp
@@ -34,7 +34,7 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    # register_logging(app, config_name)  # 注册日志处理器
+    register_logging(app, config_name)  # 注册日志处理器
     register_blueprints(app)  # 注册蓝图
     register_errors(app)  # 注册错误处理器
     register_extensions(app)  # 注册扩展(扩展初始化)
@@ -69,6 +69,13 @@ def register_extensions(app):
     login_manager.init_app(app)
     redis_store.init_app(app)
     csrf_protect.init_app(app)
+    csrf_protect.exempt(blog_bp)
+    csrf_protect.exempt(admin_bp)
+    csrf_protect.exempt(auth_bp)
+    csrf_protect.exempt(user_bp)
+    csrf_protect.exempt(journey_bp)
+    csrf_protect.exempt(board_bp)
+    csrf_protect.exempt(oauth_bp)
 
 
 def register_blueprints(app):
@@ -171,8 +178,9 @@ def register_commands(app):
             user = User()
             user.nick_name = username,
             user.mobile = '13888888888',
-            user.is_admin = True,
+            user.is_admin = (True, )[0],
             user.password = password
+            user.email = '2227628925@qq.com'
             db.session.add(user)
 
         category = Category.query.first()
@@ -180,6 +188,7 @@ def register_commands(app):
             click.echo('Creating the default category...')
             category = Category()
             category.cg_name = 'Default'
+            db.session.add(category)
 
         db.session.commit()
         click.echo('done')

@@ -5,6 +5,7 @@
 # @GitHub   : https://github.com/Locusc
 """
 import os
+import time
 from datetime import datetime
 
 import requests
@@ -98,6 +99,15 @@ def get_oauth_user_messages(access_token):
             return jsonify(code=RET.DATABASE_COMMIT_ERROR, msg='提交用户信息到数据库失败')
     else:
         user = User()
+        try:
+            user_check = User.query.filter_by(nick_name=user_json['login']).first()
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(code=RET.DATABASE_COMMIT_ERROR, msg='查询数据库数据错误')
+        if user_check:
+            user.nick_name = user_json['login'] + str(time.time()).split('.')[1]
+        else:
+            user.nick_name = user_json['login']
         user.id = user_json['id']
         user.email = user_json['email'] if user_json['email'] else user_json['html_url']
         user.avatar_url = user_json['avatar_url']
