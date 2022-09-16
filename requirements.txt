@@ -19,7 +19,7 @@ python-dateutil==2.8.0
 pymysql==0.9.3
 six==1.12.0
 alembic==1.1.0
-Mako==1.1.0
+Mako==1.2.2
 redis==3.3.8
 WTForms==2.2.1
 watchdog==0.9.0
